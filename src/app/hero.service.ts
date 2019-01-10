@@ -3,7 +3,6 @@ import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Hero } from './hero';
-import { HEROES } from './mock-heroes';
 import { MessageService } from './message.service';
 
 @Injectable({
@@ -94,5 +93,15 @@ export class HeroService {
       catchError(this.handleError<Hero>('deleteHero'))
     );
   }
-  
+
+  // GET hereos whose name contains search term
+  searchHeroes(term: String): Observable<Hero[]> {
+    if(!term.trim()){
+      return of([]);
+    }
+    return this.http.get<Hero[]>(`${this.heroesUrl}/?name=${term}`).pipe(
+      tap(_ => this.log(`found heroes matching "${term}"`)),
+      catchError(this.handleError<Hero[]>('searchHeroes', []))
+    );
+  }
 }
